@@ -24,16 +24,17 @@ FOR (a:Article) ON (a.community_id);
 CREATE INDEX article_target IF NOT EXISTS
 FOR (a:Article) ON (a.target);
 
-// 3) Load Communities
+// 3) load communities.csv
 LOAD CSV WITH HEADERS FROM 'file:///communities.csv' AS row
 MERGE (c:Community {community_id: toInteger(row.community_id)})
 SET
-  c.size           = toInteger(row.size),
-  c.level          = row.level,
-  c.density        = toFloat(row.density),
-  c.avg_degree     = toFloat(row.avg_degree),
-  c.avg_traffic    = toFloat(row.avg_traffic),
+  c.size = toInteger(row.size),
+  c.level = row.level,
+  c.density = toFloat(row.density),
+  c.avg_degree = toFloat(row.avg_degree),
+  c.avg_traffic = toFloat(row.avg_traffic),
   c.median_traffic = toFloat(row.median_traffic);
+
 
 // 4) Load Articles (and store target + community_id as properties)
 LOAD CSV WITH HEADERS FROM 'file:///article.csv' AS row
