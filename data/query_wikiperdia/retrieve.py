@@ -9,25 +9,21 @@ headers = {
     "User-Agent": "kg_wiki_project/1.0 (contact: you@example.com)"
 }
 
-# Use "organization" - has more direct subclasses with articles
-ROOT_QID = "Q43229"  # organization (alternative: Q4830453 for business)
+ROOT_QID = "Q43229"  # organization
 
-# SIMPLIFIED query - removed complex OPTIONAL clauses
+# Query 1: Main concepts + articles + hierarchy
 BASE_QUERY = f"""
 SELECT DISTINCT 
   ?concept ?conceptLabel ?conceptDescription
   ?article ?articleTitle 
   ?parent ?parentLabel
 WHERE {{
-  # Get direct subclasses only
   ?concept wdt:P279 wd:{ROOT_QID} .
   
-  # REQUIRE Wikipedia article
   ?article schema:about ?concept ;
            schema:isPartOf <https://en.wikipedia.org/> ;
            schema:name ?articleTitle .
   
-  # Get parent (same as concept's subclass)
   OPTIONAL {{ ?concept wdt:P279 ?parent . }}
   
   SERVICE wikibase:label {{ 
@@ -45,21 +41,20 @@ def val(row: dict, key: str) -> str | None:
     return row[key]["value"] if key in row else None
 
 def fetch_all_data(limit: int = 100, max_results: int = 500, retries: int = 3) -> pd.DataFrame:
-    """Fetch data with pagination - smaller batches to avoid timeout"""
+    """Fetch main data with pagination"""
     offset = 0
     all_rows = []
     
     while len(all_rows) < max_results:
         query = BASE_QUERY + f"\nLIMIT {limit}\nOFFSET {offset}"
-        
-        print(f"Fetching offset={offset}...")
+        print(f"Fetching batch at offset={offset}...")
         
         for attempt in range(retries):
             try:
                 r = requests.get(endpoint, params={"query": query}, headers=headers, timeout=120)
                 
                 if r.status_code in (429, 502, 503, 504):
-                    sleep_s = 5 * (attempt + 1)  # Longer waits
+                    sleep_s = 5 * (attempt + 1)
                     print(f"  Server busy (HTTP {r.status_code}). Sleeping {sleep_s}s...")
                     time.sleep(sleep_s)
                     continue
@@ -68,7 +63,7 @@ def fetch_all_data(limit: int = 100, max_results: int = 500, retries: int = 3) -
                 data = r.json()["results"]["bindings"]
                 
                 if not data:
-                    print(f"  No more results at offset={offset}")
+                    print(f"  No more results")
                     return pd.DataFrame(all_rows)
                 
                 for row in data:
@@ -84,31 +79,112 @@ def fetch_all_data(limit: int = 100, max_results: int = 500, retries: int = 3) -
                 
                 print(f"  ✓ Fetched {len(data)} rows (total: {len(all_rows)})")
                 offset += limit
-                time.sleep(2)  # Be extra polite
+                time.sleep(2)
                 break
                 
             except Exception as e:
                 if attempt == retries - 1:
-                    print(f"  ✗ Failed after {retries} attempts: {e}")
+                    print(f"  ✗ Failed: {e}")
                     return pd.DataFrame(all_rows)
                 time.sleep(5 * (attempt + 1))
         
-        # If we got fewer results than limit, we're done
         if len(data) < limit:
-            print(f"  Reached end of results")
             break
     
     return pd.DataFrame(all_rows)
 
+def fetch_article_links(concept_ids: list) -> pd.DataFrame:
+    """
+    NOUVELLE FONCTION : Récupère les relations entre articles via Wikidata
+    
+    Stratégie : Si concept1 a une relation sémantique avec concept2,
+    et tous deux ont des articles Wikipedia, alors créer un lien entre les articles
+    """
+    print("\n" + "="*70)
+    print("FETCHING ARTICLE-TO-ARTICLE LINKS FROM WIKIDATA")
+    print("="*70)
+    
+    if len(concept_ids) > 50:
+        concept_ids = concept_ids[:50]
+    
+    values_str = " ".join([f"wd:{cid}" for cid in concept_ids])
+    
+    # Query pour trouver toutes les relations sémantiques entre concepts
+    query = f"""
+    SELECT DISTINCT ?concept1 ?article1 ?article1Title
+                    ?concept2 ?article2 ?article2Title
+                    ?property ?propertyLabel
+    WHERE {{
+      VALUES ?concept1 {{ {values_str} }}
+      
+      # Relations sémantiques importantes
+      ?concept1 ?property ?concept2 .
+      
+      # Filtrer sur les propriétés pertinentes
+      FILTER(?property IN (
+        wdt:P361,   # part of
+        wdt:P527,   # has part
+        wdt:P1269,  # facet of
+        wdt:P279,   # subclass of (redondant avec hierarchy mais utile)
+        wdt:P366,   # use
+        wdt:P460,   # said to be the same as
+        wdt:P1659,  # see also
+        wdt:P138,   # named after
+        wdt:P2354   # has list
+      ))
+      
+      # Les deux concepts doivent avoir des articles Wikipedia EN
+      ?article1 schema:about ?concept1 ;
+                schema:isPartOf <https://en.wikipedia.org/> ;
+                schema:name ?article1Title .
+      
+      ?article2 schema:about ?concept2 ;
+                schema:isPartOf <https://en.wikipedia.org/> ;
+                schema:name ?article2Title .
+      
+      # Labels pour les propriétés
+      SERVICE wikibase:label {{ 
+        bd:serviceParam wikibase:language "en". 
+        ?property rdfs:label ?propertyLabel .
+      }}
+    }}
+    LIMIT 500
+    """
+    
+    try:
+        print("Querying Wikidata for semantic links between articles...")
+        r = requests.get(endpoint, params={"query": query}, headers=headers, timeout=180)
+        r.raise_for_status()
+        data = r.json()["results"]["bindings"]
+        
+        rows = []
+        for row in data:
+            rows.append({
+                "source_concept_id": qid(val(row, "concept1")),
+                "source_article_url": val(row, "article1"),
+                "source_article_title": val(row, "article1Title"),
+                "target_concept_id": qid(val(row, "concept2")),
+                "target_article_url": val(row, "article2"),
+                "target_article_title": val(row, "article2Title"),
+                "relation_property": val(row, "property").split("/")[-1] if val(row, "property") else None,
+                "relation_label": val(row, "propertyLabel")
+            })
+        
+        print(f"  ✓ Fetched {len(rows)} article-to-article semantic links!")
+        return pd.DataFrame(rows)
+    
+    except Exception as e:
+        print(f"  ✗ Failed to fetch article links: {e}")
+        return pd.DataFrame()
+
 def fetch_related_concepts(concept_ids: list) -> pd.DataFrame:
-    """Fetch related concepts in a separate, simpler query"""
+    """Fetch related concepts (part_of, has_part)"""
     print("\nFetching related concepts...")
     
-    # Build a query for related concepts (much simpler)
     if len(concept_ids) > 50:
-        concept_ids = concept_ids[:50]  # Limit to avoid timeout
+        concept_ids = concept_ids[:50]
     
-    values_str = " ".join([f"wd:{qid}" for qid in concept_ids])
+    values_str = " ".join([f"wd:{cid}" for cid in concept_ids])
     
     query = f"""
     SELECT DISTINCT ?concept ?related ?relatedLabel
@@ -144,17 +220,17 @@ def fetch_related_concepts(concept_ids: list) -> pd.DataFrame:
         return pd.DataFrame(rows)
     
     except Exception as e:
-        print(f"  ✗ Failed to fetch related concepts: {e}")
+        print(f"  ✗ Failed: {e}")
         return pd.DataFrame()
 
 def fetch_categories(concept_ids: list) -> pd.DataFrame:
-    """Fetch categories/tags in a separate query"""
+    """Fetch categories/tags"""
     print("\nFetching categories/tags...")
     
     if len(concept_ids) > 50:
         concept_ids = concept_ids[:50]
     
-    values_str = " ".join([f"wd:{qid}" for qid in concept_ids])
+    values_str = " ".join([f"wd:{cid}" for cid in concept_ids])
     
     query = f"""
     SELECT DISTINCT ?concept ?category ?categoryLabel
@@ -174,7 +250,7 @@ def fetch_categories(concept_ids: list) -> pd.DataFrame:
         rows = []
         for row in data:
             cat_id = qid(val(row, "category"))
-            if cat_id != ROOT_QID:  # Exclude root
+            if cat_id != ROOT_QID:
                 rows.append({
                     "concept_id": qid(val(row, "concept")),
                     "category_id": cat_id,
@@ -185,34 +261,39 @@ def fetch_categories(concept_ids: list) -> pd.DataFrame:
         return pd.DataFrame(rows)
     
     except Exception as e:
-        print(f"  ✗ Failed to fetch categories: {e}")
+        print(f"  ✗ Failed: {e}")
         return pd.DataFrame()
 
 def main():
-    print("="*60)
-    print("FETCHING KNOWLEDGE BASE DATA FROM WIKIDATA")
-    print("="*60)
-    print(f"Root concept: {ROOT_QID}")
-    print("This may take 2-5 minutes...\n")
+    print("="*70)
+    print("KNOWLEDGE BASE DATA EXTRACTION WITH ARTICLE LINKS")
+    print("="*70)
+    print(f"Root concept: {ROOT_QID} (organization)")
+    print("Estimated time: 3-5 minutes\n")
     
-    # Fetch main data (concepts, articles, hierarchy)
+    # ===== STEP 1: Fetch main data =====
     main_df = fetch_all_data(limit=100, max_results=500)
     
     if main_df.empty:
-        print("\n✗ No data retrieved! Try a different ROOT_QID")
+        print("\n✗ No data retrieved!")
         return
     
-    print(f"\n✓ Total rows fetched: {len(main_df)}")
-    
-    # Get unique concept IDs
+    print(f"\n✓ Total rows: {len(main_df)}")
     concept_ids = main_df["concept_id"].dropna().unique().tolist()
     print(f"✓ Unique concepts: {len(concept_ids)}")
     
-    # Fetch related concepts (separate query)
+    # ===== STEP 2: Fetch article links (NOUVEAU!) =====
+    article_links_raw = fetch_article_links(concept_ids)
+    
+    # ===== STEP 3: Fetch related concepts =====
     related_df = fetch_related_concepts(concept_ids)
     
-    # Fetch categories (separate query)
+    # ===== STEP 4: Fetch categories =====
     categories_df = fetch_categories(concept_ids)
+    
+    print("\n" + "="*70)
+    print("PROCESSING AND EXPORTING DATA")
+    print("="*70)
     
     # ===== Export 1: TOPICS =====
     topics = (main_df[["concept_id", "concept_name", "concept_description"]]
@@ -226,7 +307,32 @@ def main():
                 .reset_index(drop=True))
     articles.insert(0, "article_id", ["A" + str(i).zfill(6) for i in range(len(articles))])
     
-    # ===== Export 3: TAGS =====
+    # ===== Export 3: ARTICLE LINKS (NOUVEAU!) =====
+    if not article_links_raw.empty:
+        # Map URLs to article IDs
+        url_to_id = dict(zip(articles['article_url'], articles['article_id']))
+        
+        article_links = []
+        for _, row in article_links_raw.iterrows():
+            source_url = row['source_article_url']
+            target_url = row['target_article_url']
+            
+            # Only keep links between articles we have
+            if source_url in url_to_id and target_url in url_to_id:
+                article_links.append({
+                    'source_article_id': url_to_id[source_url],
+                    'target_article_id': url_to_id[target_url],
+                    'link_type': row['relation_label'],
+                    'wikidata_property': row['relation_property']
+                })
+        
+        article_links_df = pd.DataFrame(article_links).drop_duplicates(
+            subset=['source_article_id', 'target_article_id']
+        )
+    else:
+        article_links_df = pd.DataFrame(columns=['source_article_id', 'target_article_id', 'link_type', 'wikidata_property'])
+    
+    # ===== Export 4: TAGS =====
     if not categories_df.empty:
         tags = (categories_df[["category_id", "category_name"]]
                 .dropna(subset=["category_id"])
@@ -234,13 +340,13 @@ def main():
     else:
         tags = pd.DataFrame(columns=["category_id", "category_name"])
     
-    # ===== Export 4: TOPIC_HIERARCHY =====
+    # ===== Export 5: TOPIC_HIERARCHY =====
     topic_hierarchy = (main_df[["concept_id", "parent_id"]]
                        .dropna()
                        .drop_duplicates()
                        .rename(columns={"concept_id": "child_topic_id", "parent_id": "parent_topic_id"}))
     
-    # ===== Export 5: RELATED_TOPICS =====
+    # ===== Export 6: RELATED_TOPICS =====
     if not related_df.empty:
         related_topics = (related_df[["concept_id", "related_id", "relation_type"]]
                           .dropna(subset=["related_id"])
@@ -249,12 +355,12 @@ def main():
     else:
         related_topics = pd.DataFrame(columns=["topic_id", "related_topic_id", "relation_type"])
     
-    # ===== Export 6: ARTICLE_TOPICS =====
+    # ===== Export 7: ARTICLE_TOPICS =====
     article_topics = (articles[["article_id", "concept_id"]]
                       .dropna()
                       .rename(columns={"concept_id": "topic_id"}))
     
-    # ===== Export 7: TOPIC_TAGS =====
+    # ===== Export 8: TOPIC_TAGS =====
     if not categories_df.empty:
         topic_tags = (categories_df[["concept_id", "category_id"]]
                       .dropna()
@@ -263,22 +369,23 @@ def main():
     else:
         topic_tags = pd.DataFrame(columns=["topic_id", "tag_id"])
     
-    # ===== Export 8: AUTHORS =====
+    # ===== Export 9: AUTHORS =====
     authors = pd.DataFrame({
         "author_id": ["AUTH001", "AUTH002", "AUTH003"],
         "author_name": ["Wikipedia Contributors", "Community Editors", "Domain Experts"],
         "email": ["contributors@wikipedia.org", "editors@wikipedia.org", "experts@wikipedia.org"]
     })
     
-    # ===== Export 9: ARTICLE_AUTHORS =====
+    # ===== Export 10: ARTICLE_AUTHORS =====
     article_authors = pd.DataFrame({
         "article_id": articles["article_id"].tolist()[:min(50, len(articles))],
         "author_id": [random.choice(authors["author_id"].tolist()) for _ in range(min(50, len(articles)))]
     })
     
-    # Save all CSVs
+    # ===== SAVE ALL CSVs =====
     topics.to_csv("topics.csv", index=False, encoding="utf-8")
     articles.to_csv("articles.csv", index=False, encoding="utf-8")
+    article_links_df.to_csv("article_links.csv", index=False, encoding="utf-8")  # NOUVEAU!
     tags.to_csv("tags.csv", index=False, encoding="utf-8")
     topic_hierarchy.to_csv("topic_hierarchy.csv", index=False, encoding="utf-8")
     related_topics.to_csv("related_topics.csv", index=False, encoding="utf-8")
@@ -287,11 +394,13 @@ def main():
     authors.to_csv("authors.csv", index=False, encoding="utf-8")
     article_authors.to_csv("article_authors.csv", index=False, encoding="utf-8")
     
-    print("\n" + "="*60)
-    print("✓ KNOWLEDGE BASE DATA EXPORTED")
-    print("="*60)
+    # ===== FINAL REPORT =====
+    print("\n" + "="*70)
+    print("✅ KNOWLEDGE BASE DATA EXPORTED")
+    print("="*70)
     print(f"Topics:            {len(topics):>6} rows -> topics.csv")
     print(f"Articles:          {len(articles):>6} rows -> articles.csv")
+    print(f"🆕 Article Links:  {len(article_links_df):>6} rows -> article_links.csv")
     print(f"Tags:              {len(tags):>6} rows -> tags.csv")
     print(f"Topic Hierarchy:   {len(topic_hierarchy):>6} rows -> topic_hierarchy.csv")
     print(f"Related Topics:    {len(related_topics):>6} rows -> related_topics.csv")
@@ -299,8 +408,20 @@ def main():
     print(f"Topic-Tags:        {len(topic_tags):>6} rows -> topic_tags.csv")
     print(f"Authors:           {len(authors):>6} rows -> authors.csv")
     print(f"Article-Authors:   {len(article_authors):>6} rows -> article_authors.csv")
-    print("="*60)
-    print("\n✓ Next step: Move CSVs to import/ folder and load into Neo4j")
+    print("="*70)
+    
+    if not article_links_df.empty:
+        print("\n📊 ARTICLE LINKS STATISTICS:")
+        print(f"Total article-to-article links: {len(article_links_df)}")
+        print("\nTop link types:")
+        print(article_links_df['link_type'].value_counts().head(10))
+        print("\nMost linked articles:")
+        top_sources = article_links_df['source_article_id'].value_counts().head(5)
+        for art_id, count in top_sources.items():
+            title = articles[articles['article_id'] == art_id]['article_title'].values[0]
+            print(f"  {title}: {count} outgoing links")
+    
+    print("\n Next step: Move CSVs to Neo4j import/ folder and run Cypher load script")
 
 if __name__ == "__main__":
     main()
