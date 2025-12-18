@@ -1,17 +1,54 @@
 category_id,category_name
-Q10541491,legal form
-Q19592272,city commission government
-Q98116669,religious complex
-Q117023459,type of institution
+Q268592,industry
+Q1047113,field of study
+Q1664720,institute
 Q17197366,type of organization
+Q10541491,legal form
+Q129133491,ethnological term
+Q2135465,legal term or legal concept
+Q19592272,city commission government
+Q11862829,academic discipline
+Q98116669,religious complex
+Q1269299,type of business entity
+Q130989,neologism
+Q117023459,type of institution
+Q13226383,facility
+Q130303173,service type
 Q868557,music festival
 Q4307514,municipal government
+Q21484471,Wikimedia article covering multiple topics
+Q17350442,venue
+Q1889,diplomacy
+Q295382,sustainable business
+Q15617994,administrative territorial entity type
+Q4830453,business
+Q163740,nonprofit organization
+Q105756498,type of musical group
+Q2385804,educational institution
+Q327333,government agency
+Q77080538,video game term
+Q49773,social movement
+Q931483,legal fiction
 Q1975176,Schutterij
 Q2300494,summer festival
 Q28872924,designation for an administrative territorial entity of a single country
+Q1307214,form of government
+Q815823,business model
+Q63981612,product category
+Q3914,school
+Q1914636,activity
+Q2738074,political movement
+Q685935,trade magazine
+Q176799,military unit
+Q183039,form of state
 Q108028209,designation type
+Q1744559,classification in sports
+Q29028649,economic concept
 Q1979154,model
+Q56427813,type of legal entity in France
+Q179049,nature reserve
 Q3249551,process
-Q151885,concept
-Q1269299,type of business entity
+Q4485156,software feature
+Q38723,higher education institution
+Q273005,economic system
 Q4897819,role
