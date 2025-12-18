@@ -1,0 +1,4 @@
+source_article_id,target_article_id,link_type,wikidata_property
+A000024,A000044,http://www.wikidata.org/prop/direct/P460,P460
+A000044,A000024,http://www.wikidata.org/prop/direct/P279,P279
+A000005,A000148,http://www.wikidata.org/prop/direct/P279,P279
