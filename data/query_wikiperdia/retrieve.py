@@ -103,9 +103,9 @@ def fetch_article_links(concept_ids: list) -> pd.DataFrame:
     print("\n" + "="*70)
     print("FETCHING ARTICLE-TO-ARTICLE LINKS FROM WIKIDATA")
     print("="*70)
-    
-    if len(concept_ids) > 50:
-        concept_ids = concept_ids[:50]
+
+    if len(concept_ids) > 200:
+        concept_ids = concept_ids[:200]
     
     values_str = " ".join([f"wd:{cid}" for cid in concept_ids])
     
@@ -148,7 +148,7 @@ def fetch_article_links(concept_ids: list) -> pd.DataFrame:
         ?property rdfs:label ?propertyLabel .
       }}
     }}
-    LIMIT 500
+    LIMIT 1000
     """
     
     try:
@@ -180,9 +180,9 @@ def fetch_article_links(concept_ids: list) -> pd.DataFrame:
 def fetch_related_concepts(concept_ids: list) -> pd.DataFrame:
     """Fetch related concepts (part_of, has_part)"""
     print("\nFetching related concepts...")
-    
-    if len(concept_ids) > 50:
-        concept_ids = concept_ids[:50]
+
+    if len(concept_ids) > 200:
+        concept_ids = concept_ids[:200]
     
     values_str = " ".join([f"wd:{cid}" for cid in concept_ids])
     
@@ -226,12 +226,12 @@ def fetch_related_concepts(concept_ids: list) -> pd.DataFrame:
 def fetch_categories(concept_ids: list) -> pd.DataFrame:
     """Fetch categories/tags"""
     print("\nFetching categories/tags...")
-    
-    if len(concept_ids) > 50:
-        concept_ids = concept_ids[:50]
-    
+
+    if len(concept_ids) > 200:
+        concept_ids = concept_ids[:200]
+
     values_str = " ".join([f"wd:{cid}" for cid in concept_ids])
-    
+
     query = f"""
     SELECT DISTINCT ?concept ?category ?categoryLabel
     WHERE {{
@@ -241,12 +241,12 @@ def fetch_categories(concept_ids: list) -> pd.DataFrame:
     }}
     LIMIT 200
     """
-    
+
     try:
         r = requests.get(endpoint, params={"query": query}, headers=headers, timeout=120)
         r.raise_for_status()
         data = r.json()["results"]["bindings"]
-        
+
         rows = []
         for row in data:
             cat_id = qid(val(row, "category"))
@@ -256,23 +256,153 @@ def fetch_categories(concept_ids: list) -> pd.DataFrame:
                     "category_id": cat_id,
                     "category_name": val(row, "categoryLabel"),
                 })
-        
+
         print(f"  ✓ Fetched {len(rows)} category relationships")
         return pd.DataFrame(rows)
-    
+
     except Exception as e:
         print(f"  ✗ Failed: {e}")
         return pd.DataFrame()
+
+def fetch_authors_from_xtools(articles_df: pd.DataFrame, max_articles: int = 50, top_n_editors: int = 10) -> tuple:
+    """
+    Fetch real Wikipedia contributors using XTools API
+
+    Args:
+        articles_df: DataFrame with article_title column
+        max_articles: Maximum number of articles to fetch authors for (to avoid long runtime)
+        top_n_editors: Number of top editors to fetch per article
+
+    Returns:
+        tuple: (authors_df, article_authors_df)
+    """
+    print("\n" + "="*70)
+    print("FETCHING REAL AUTHORS FROM XTOOLS")
+    print("="*70)
+    print(f"Querying XTools for top {top_n_editors} editors per article...")
+    print(f"Processing up to {max_articles} articles (this may take a few minutes)")
+
+    # Limit the number of articles to process
+    articles_to_process = articles_df.head(max_articles)
+
+    all_authors = {}  # username -> author data
+    article_author_pairs = []  # (article_id, author_username, edit_count)
+
+    for idx, row in articles_to_process.iterrows():
+        article_id = row['article_id']
+        article_title = row['article_title']
+
+        # URL encode the article title
+        encoded_title = requests.utils.quote(article_title.replace(' ', '_'))
+        xtools_url = f"https://xtools.wmcloud.org/api/page/top_editors/en.wikipedia.org/{encoded_title}"
+
+        try:
+            print(f"  [{idx+1}/{len(articles_to_process)}] Fetching authors for: {article_title}")
+            r = requests.get(xtools_url, timeout=30)
+
+            if r.status_code == 404:
+                print(f"    ⚠ Article not found, skipping...")
+                time.sleep(1)
+                continue
+
+            if r.status_code != 200:
+                print(f"    ⚠ HTTP {r.status_code}, skipping...")
+                time.sleep(2)
+                continue
+
+            data = r.json()
+
+            # Extract top editors
+            top_editors = data.get('top_editors', [])
+            if not top_editors:
+                print(f"    ⚠ No editors found, skipping...")
+                time.sleep(1)
+                continue
+
+            # Take top N editors
+            for editor in top_editors[:top_n_editors]:
+                username = editor.get('username')
+                edit_count = editor.get('count', 0)
+
+                if not username:
+                    continue
+
+                # Add to authors dict if not already present
+                if username not in all_authors:
+                    all_authors[username] = {
+                        'username': username,
+                        'total_edits': 0
+                    }
+
+                # Track total edits across all articles
+                all_authors[username]['total_edits'] += edit_count
+
+                # Add article-author relationship
+                article_author_pairs.append({
+                    'article_id': article_id,
+                    'author_username': username,
+                    'edit_count': edit_count
+                })
+
+            print(f"    ✓ Found {len(top_editors[:top_n_editors])} editors")
+
+            # Rate limiting - be nice to XTools
+            time.sleep(1.5)
+
+        except requests.exceptions.Timeout:
+            print(f"    ✗ Timeout, skipping...")
+            time.sleep(2)
+        except Exception as e:
+            print(f"    ✗ Error: {e}")
+            time.sleep(2)
+
+    # Create authors DataFrame
+    if all_authors:
+        authors_list = []
+        for idx, (username, data) in enumerate(all_authors.items(), 1):
+            authors_list.append({
+                'author_id': f"AUTH{str(idx).zfill(5)}",
+                'author_name': username,
+                'total_edits': data['total_edits']
+            })
+        authors_df = pd.DataFrame(authors_list)
+
+        # Map usernames to author IDs for article_authors
+        username_to_id = dict(zip(authors_df['author_name'], authors_df['author_id']))
+
+        # Create article_authors DataFrame
+        article_authors_list = []
+        for pair in article_author_pairs:
+            author_id = username_to_id.get(pair['author_username'])
+            if author_id:
+                article_authors_list.append({
+                    'article_id': pair['article_id'],
+                    'author_id': author_id,
+                    'edit_count': pair['edit_count']
+                })
+        article_authors_df = pd.DataFrame(article_authors_list)
+
+        print(f"\n✓ Total unique authors found: {len(authors_df)}")
+        print(f"✓ Total article-author relationships: {len(article_authors_df)}")
+
+        return authors_df, article_authors_df
+    else:
+        print("\n✗ No authors retrieved!")
+        # Return empty DataFrames with correct schema
+        return (
+            pd.DataFrame(columns=['author_id', 'author_name', 'total_edits']),
+            pd.DataFrame(columns=['article_id', 'author_id', 'edit_count'])
+        )
 
 def main():
     print("="*70)
     print("KNOWLEDGE BASE DATA EXTRACTION WITH ARTICLE LINKS")
     print("="*70)
     print(f"Root concept: {ROOT_QID} (organization)")
-    print("Estimated time: 3-5 minutes\n")
+    print("Estimated time: 10-15 minutes (larger dataset)\n")
     
     # ===== STEP 1: Fetch main data =====
-    main_df = fetch_all_data(limit=100, max_results=500)
+    main_df = fetch_all_data(limit=100, max_results=2000)
     
     if main_df.empty:
         print("\n✗ No data retrieved!")
@@ -369,45 +499,39 @@ def main():
     else:
         topic_tags = pd.DataFrame(columns=["topic_id", "tag_id"])
     
-    # ===== Export 9: AUTHORS =====
-    authors = pd.DataFrame({
-        "author_id": ["AUTH001", "AUTH002", "AUTH003"],
-        "author_name": ["Wikipedia Contributors", "Community Editors", "Domain Experts"],
-        "email": ["contributors@wikipedia.org", "editors@wikipedia.org", "experts@wikipedia.org"]
-    })
-    
-    # ===== Export 10: ARTICLE_AUTHORS =====
-    article_authors = pd.DataFrame({
-        "article_id": articles["article_id"].tolist()[:min(50, len(articles))],
-        "author_id": [random.choice(authors["author_id"].tolist()) for _ in range(min(50, len(articles)))]
-    })
+    # ===== Export 9 & 10: AUTHORS & ARTICLE_AUTHORS (from XTools) =====
+    authors, article_authors = fetch_authors_from_xtools(
+        articles,
+        max_articles=100,  # Process up to 100 articles (adjust as needed)
+        top_n_editors=10   # Get top 10 editors per article
+    )
     
     # ===== SAVE ALL CSVs =====
-    topics.to_csv("topics.csv", index=False, encoding="utf-8")
-    articles.to_csv("articles.csv", index=False, encoding="utf-8")
-    article_links_df.to_csv("article_links.csv", index=False, encoding="utf-8")  # NOUVEAU!
-    tags.to_csv("tags.csv", index=False, encoding="utf-8")
-    topic_hierarchy.to_csv("topic_hierarchy.csv", index=False, encoding="utf-8")
-    related_topics.to_csv("related_topics.csv", index=False, encoding="utf-8")
-    article_topics.to_csv("article_topics.csv", index=False, encoding="utf-8")
-    topic_tags.to_csv("topic_tags.csv", index=False, encoding="utf-8")
-    authors.to_csv("authors.csv", index=False, encoding="utf-8")
-    article_authors.to_csv("article_authors.csv", index=False, encoding="utf-8")
+    topics.to_csv("import/topics.csv", index=False, encoding="utf-8")
+    articles.to_csv("import/articles.csv", index=False, encoding="utf-8")
+    article_links_df.to_csv("import/article_links.csv", index=False, encoding="utf-8")  # NOUVEAU!
+    tags.to_csv("import/tags.csv", index=False, encoding="utf-8")
+    topic_hierarchy.to_csv("import/topic_hierarchy.csv", index=False, encoding="utf-8")
+    related_topics.to_csv("import/related_topics.csv", index=False, encoding="utf-8")
+    article_topics.to_csv("import/article_topics.csv", index=False, encoding="utf-8")
+    topic_tags.to_csv("import/topic_tags.csv", index=False, encoding="utf-8")
+    authors.to_csv("import/authors.csv", index=False, encoding="utf-8")
+    article_authors.to_csv("import/article_authors.csv", index=False, encoding="utf-8")
     
     # ===== FINAL REPORT =====
     print("\n" + "="*70)
     print("✅ KNOWLEDGE BASE DATA EXPORTED")
     print("="*70)
-    print(f"Topics:            {len(topics):>6} rows -> topics.csv")
-    print(f"Articles:          {len(articles):>6} rows -> articles.csv")
-    print(f"🆕 Article Links:  {len(article_links_df):>6} rows -> article_links.csv")
-    print(f"Tags:              {len(tags):>6} rows -> tags.csv")
-    print(f"Topic Hierarchy:   {len(topic_hierarchy):>6} rows -> topic_hierarchy.csv")
-    print(f"Related Topics:    {len(related_topics):>6} rows -> related_topics.csv")
-    print(f"Article-Topics:    {len(article_topics):>6} rows -> article_topics.csv")
-    print(f"Topic-Tags:        {len(topic_tags):>6} rows -> topic_tags.csv")
-    print(f"Authors:           {len(authors):>6} rows -> authors.csv")
-    print(f"Article-Authors:   {len(article_authors):>6} rows -> article_authors.csv")
+    print(f"Topics:            {len(topics):>6} rows -> import/topics.csv")
+    print(f"Articles:          {len(articles):>6} rows -> import/articles.csv")
+    print(f"🆕 Article Links:  {len(article_links_df):>6} rows -> import/article_links.csv")
+    print(f"Tags:              {len(tags):>6} rows -> import/tags.csv")
+    print(f"Topic Hierarchy:   {len(topic_hierarchy):>6} rows -> import/topic_hierarchy.csv")
+    print(f"Related Topics:    {len(related_topics):>6} rows -> import/related_topics.csv")
+    print(f"Article-Topics:    {len(article_topics):>6} rows -> import/article_topics.csv")
+    print(f"Topic-Tags:        {len(topic_tags):>6} rows -> import/topic_tags.csv")
+    print(f"Authors:           {len(authors):>6} rows -> import/authors.csv")
+    print(f"Article-Authors:   {len(article_authors):>6} rows -> import/article_authors.csv")
     print("="*70)
     
     if not article_links_df.empty:
@@ -421,7 +545,7 @@ def main():
             title = articles[articles['article_id'] == art_id]['article_title'].values[0]
             print(f"  {title}: {count} outgoing links")
     
-    print("\n Next step: Move CSVs to Neo4j import/ folder and run Cypher load script")
+    print("\n✅ CSVs saved to import/ folder. Next step: Run Cypher load script")
 
 if __name__ == "__main__":
     main()
