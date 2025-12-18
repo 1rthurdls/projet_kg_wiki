@@ -1,13 +1,7 @@
 from fastapi import APIRouter, HTTPException, Request, status
 
-from app.models.schemas import (
-    EntityNode,
-    EntitySearchRequest,
-    GraphQueryRequest,
-    GraphQueryResponse,
-    Relationship,
-)
 from app.database import Neo4jService
+from app.models.schemas import EntityNode, EntitySearchRequest, GraphQueryRequest, GraphQueryResponse, Relationship
 
 router = APIRouter()
 
@@ -26,15 +20,13 @@ async def execute_query(request: Request, query_request: GraphQueryRequest):
     neo4j_service: Neo4jService = request.app.state.neo4j_service
 
     try:
-        results = neo4j_service.execute_query(
-            query_request.query, query_request.parameters
-        )
+        results = neo4j_service.execute_query(query_request.query, query_request.parameters)
         return GraphQueryResponse(data=results, count=len(results))
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Query execution failed: {str(e)}",
-        )
+        ) from e
 
 
 @router.post("/search", response_model=list[EntityNode])
@@ -51,9 +43,7 @@ async def search_entities(request: Request, search_request: EntitySearchRequest)
     neo4j_service: Neo4jService = request.app.state.neo4j_service
 
     try:
-        results = neo4j_service.search_entities(
-            search_request.search_term, search_request.limit
-        )
+        results = neo4j_service.search_entities(search_request.search_term, search_request.limit)
         return [
             EntityNode(
                 id=str(result["id"]),
@@ -66,7 +56,7 @@ async def search_entities(request: Request, search_request: EntitySearchRequest)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Search failed: {str(e)}",
-        )
+        ) from e
 
 
 @router.get("/entities/{entity_id}", response_model=EntityNode)
@@ -101,13 +91,11 @@ async def get_entity(request: Request, entity_id: str):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to retrieve entity: {str(e)}",
-        )
+        ) from e
 
 
 @router.get("/entities/{entity_id}/relationships", response_model=list[Relationship])
-async def get_entity_relationships(
-    request: Request, entity_id: str, direction: str = "both"
-):
+async def get_entity_relationships(request: Request, entity_id: str, direction: str = "both"):
     """
     Get relationships for an entity.
 
@@ -142,4 +130,4 @@ async def get_entity_relationships(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to retrieve relationships: {str(e)}",
-        )
+        ) from e

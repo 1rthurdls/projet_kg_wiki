@@ -1,5 +1,6 @@
-from fastapi import APIRouter, HTTPException, Request, Query, status
+from fastapi import APIRouter, HTTPException, Query, Request, status
 
+from app.database import Neo4jService
 from app.models.schemas import (
     AnalyticsResponse,
     ArticleStats,
@@ -13,7 +14,6 @@ from app.models.schemas import (
     SubgraphRequest,
     SubgraphResponse,
 )
-from app.database import Neo4jService
 
 router = APIRouter()
 
@@ -50,14 +50,12 @@ async def find_shortest_path(request: Request, path_request: PathRequest):
 
         path_nodes = [PathNode(**node) for node in result["path"]]
 
-        return PathResponse(
-            path=path_nodes, length=result["length"], exists=result["exists"]
-        )
+        return PathResponse(path=path_nodes, length=result["length"], exists=result["exists"])
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Pathfinding failed: {str(e)}",
-        )
+        ) from e
 
 
 @router.post("/recommendations", response_model=RecommendationResponse)
@@ -94,9 +92,7 @@ async def get_recommendations(request: Request, rec_request: RecommendationReque
     neo4j_service: Neo4jService = request.app.state.neo4j_service
 
     try:
-        results = neo4j_service.get_recommendations(
-            rec_request.article_id, rec_request.limit, rec_request.strategy
-        )
+        results = neo4j_service.get_recommendations(rec_request.article_id, rec_request.limit, rec_request.strategy)
 
         recommendations = [RecommendedArticle(**rec) for rec in results]
 
@@ -109,7 +105,7 @@ async def get_recommendations(request: Request, rec_request: RecommendationReque
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Recommendation generation failed: {str(e)}",
-        )
+        ) from e
 
 
 @router.get("/analytics", response_model=AnalyticsResponse)
@@ -142,18 +138,14 @@ async def get_analytics(request: Request, top_n: int = Query(default=10, ge=1, l
             total_communities=analytics["total_communities"],
             total_edges=analytics["total_edges"],
             avg_degree=analytics["avg_degree"],
-            top_communities=[
-                CommunityStats(**comm) for comm in analytics["top_communities"]
-            ],
-            top_articles=[
-                ArticleStats(**article) for article in analytics["top_articles"]
-            ],
+            top_communities=[CommunityStats(**comm) for comm in analytics["top_communities"]],
+            top_articles=[ArticleStats(**article) for article in analytics["top_articles"]],
         )
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Analytics generation failed: {str(e)}",
-        )
+        ) from e
 
 
 @router.post("/subgraph/export", response_model=SubgraphResponse)
@@ -186,16 +178,14 @@ async def export_subgraph(request: Request, subgraph_request: SubgraphRequest):
     neo4j_service: Neo4jService = request.app.state.neo4j_service
 
     try:
-        result = neo4j_service.export_subgraph(
-            subgraph_request.community_id, subgraph_request.include_cross_edges
-        )
+        result = neo4j_service.export_subgraph(subgraph_request.community_id, subgraph_request.include_cross_edges)
 
         return SubgraphResponse(**result)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Subgraph export failed: {str(e)}",
-        )
+        ) from e
 
 
 @router.get("/communities/{community_id}/stats", response_model=CommunityStats)
@@ -244,4 +234,4 @@ async def get_community_stats(request: Request, community_id: int):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to retrieve community stats: {str(e)}",
-        )
+        ) from e

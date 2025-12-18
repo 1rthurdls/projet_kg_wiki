@@ -3,8 +3,8 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from app.main import app
 from app.database import Neo4jService
+from app.main import app
 
 
 @pytest.fixture(scope="module")
