@@ -80,9 +80,9 @@ RETURN 'Tags loaded' as Status, count(t) as Count;
 // Load AUTHORS
 LOAD CSV WITH HEADERS FROM 'file:///authors.csv' AS row
 MERGE (a:Author {author_id: row.author_id})
-SET 
+SET
   a.author_name = row.author_name,
-  a.email = row.email;
+  a.total_edits = toInteger(row.total_edits);
 
 MATCH (a:Author)
 RETURN 'Authors loaded' as Status, count(a) as Count;
@@ -161,7 +161,8 @@ RETURN 'TAGGED_WITH loaded' as Status, count(r) as Count;
 LOAD CSV WITH HEADERS FROM 'file:///article_authors.csv' AS row
 MATCH (auth:Author {author_id: row.author_id})
 MATCH (a:Article {article_id: row.article_id})
-MERGE (auth)-[:CONTRIBUTED_TO]->(a);
+MERGE (auth)-[r:CONTRIBUTED_TO]->(a)
+SET r.edit_count = toInteger(row.edit_count);
 
 MATCH ()-[r:CONTRIBUTED_TO]->()
 RETURN 'CONTRIBUTED_TO loaded' as Status, count(r) as Count;
