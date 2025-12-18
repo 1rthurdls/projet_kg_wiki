@@ -1,18 +1,26 @@
 concept_id,concept_name,concept_description
 Q5757680,,"organizations operating complex, high-hazard domains for extended periods without serious accidents or catastrophic failures"
 Q6017526,,"association or other legal entity that enters into an arrangement for the provision of services with persons who are licensed to practice medicine, osteopathy, and dentistry, and with other care personnel"
-Q6486642,,Organization that regulates a language
 Q5508841,,organization
 Q5190931,,computer security testing laboratory
+Q24746,,administrative division of the Philippines
+Q1083702,,Chinese immigrant organization
 Q3152824,,organization that works for the preservation or promotion of culture
+Q1194178,,Nature reserve in Minsk and Vitebsk regons of Belarus
+Q22908,,housing facility intended for senior citizens
 Q6017561,,organization that tests according to agreed requirements
 Q2985307,,Control of French economy under Vichy
 Q6043746,,"organization focused on copyrights, trademarks, patents, or other intellectual property law concepts"
-Q6498663,,organization with the job to help the public in emergency situations like fire
 Q5421939,,"organization that practises extension, in the context of community development."
+Q1188663,,nine institutions of higher education in the United States
 Q5582617,,
+Q11032,,"scheduled publication containing news of events, articles, features, editorials, and advertising; online, in print, or (usually) both"
+Q11315,,complex of shops
 Q6031029,,place where information is given out
+Q11033,,media technologies that are intended to reach a large audience by mass communication
+Q1141323,,set of electors who are selected to elect a candidate to a particular office
 Q5380419,,"the equivalent of ""company"" in the former socialist state"
+Q1073015,,organization or commercial entity that manages the reservation of Internet domain names
 Q1870403,,
 Q5398995,,organization covertly collecting HUMINT without jurisdiction
 Q5589293,,"City commission government system of Portland, Oregon"
@@ -21,169 +29,137 @@ Q5266682,,Organisation to foster urban development
 Q5565881,,"form of participatory philanthropy where groups of individuals donate to a pooled fund, and then collectively decide on the use of this fund for charity or community projects"
 Q3117735,,"group where various types of help, usually nonprofessional and non-material, are provided for a particular shared, usually burdensome, characteristic"
 Q3091534,,Political organization
+Q1128886,,civil aviation organization authorized to schedule an control continuing airworthiness activities on aircraft and parts thereof
 Q3068961,,"usually community-run projects in urban areas, which involve people interacting and working with animals and plants"
 Q6138323,,facility for construction and repair of rolling stock owned by a railway
 Q5341295,,body with an aim of education
 Q1818761,,local sustainable area in France
+Q1193702,,form of political opposition within a parliamentary system of government
 Q2069741,,Hindu monastery
+Q1054782,,Spanish commuter rail system
 Q1812889,,period in which a legislature is convened
 Q3119880,,name given to autonomous peasant patrols in rural Peru
 Q3064474,,administrative units of the country
 Q5194618,,an organization or an organized social group whose principal activity is focused on the development and presentation of cultural artifacts according to clearly defined and coherent themes or organizational principles
+Q1187145,,financial agency that gathers account information to predict a consumer's creditworthiness
 Q3070109,,music festival in Canada
 Q6484284,,conservation organization
+Q6486642,,Organization that regulates a language
 Q1956113,,"organization that has a subsidiary unit, e.g. for companies, which owns enough voting stock in another firm to control management and operations"
 Q3056790,,18th century militia organization in the Netherlands
 Q6015263,,legal entity in New Zealand registered under the Incorporated Societies Act 1908
 Q1934969,,organization or individual that provides products or services to a military or intelligence department of a government
+Q1132944,,facility that provides independent participatory research support in response to concerns experienced by civil society
+Q1071015,,type of organization with social objectives
 Q5955071,,"class of, oft governmental, body who survey a region's waters"
 Q5176204,,New Zealand companies owned by local councils
 Q5916251,,type of organization
 Q5466627,,type of organization
 Q5419285,,"set of people who judge exams, oppositions or other similar calls"
 Q2090372,,Jewish lending method
-Q6815100,,type of organization that has members
-Q1328304,,type of organization
-Q1229245,,"term used by the French intellectual Michel Foucault, generally to refer to the various institutional, physical, and administrative mechanisms and knowledge structures which enhance and maintain the exercise of power within the social body"
-Q6503344,,
-Q24746,,administrative division of the Philippines
-Q22908,,housing facility intended for senior citizens
-Q6664371,,only in Sweden
-Q1358919,,"system enabling communal bicycles to be shared, often in an urban setting"
-Q1514395,,organisation for people with a high IQ score
-Q1229659,,"building housing goods to be distributed to retailers, wholesalers, or consumers"
-Q6878455,,term; synonym for nonprofit
-Q1228967,,group of individuals with similar interest who gather to bring up ideas or solve problems
-Q24764,,administrative division in Philippine provinces
-Q1550557,,"economic, political and judicial institution during the Middle Age in Europe, governed by a lord owning a land domain that he partly concesses to vassals"
-Q6953133,,cancer research institution in the United States supported by the National Cancer Institute
-Q1390062,,space for digital fabrication and use of communal tools
-Q1364298,,dedicated hobby organization that uses flight simulation to model the operations of an airline
-Q11315,,complex of shops
-Q1241025,,"group of researchers often from the same faculty, specialized on the same subject, working together on the issue or topic"
-Q11033,,media technologies that are intended to reach a large audience by mass communication
-Q1394627,,Sub-ethnical division (social organization) of Chechen and Ingush people
-Q7049579,,lack of sectarianism
-Q1311569,,railway divisions for administration purposes in Germany and Austria
-Q1362509,,"annual comedy festival held in Montreal, Quebec Province, Canada"
-Q34627,,"religious building at the center of a local organization where a Jewish (or rarely Samaritan) community gathers for prayer, education, social assistance or ceremonies"
-Q1188663,,nine institutions of higher education in the United States
-Q1141323,,set of electors who are selected to elect a candidate to a particular office
-Q11032,,"scheduled publication containing news of events, articles, features, editorials, and advertising; online, in print, or (usually) both"
-Q1132944,,facility that provides independent participatory research support in response to concerns experienced by civil society
-Q1071015,,type of organization with social objectives
-Q1193702,,form of political opposition within a parliamentary system of government
-Q1054782,,Spanish commuter rail system
-Q1187145,,financial agency that gathers account information to predict a consumer's creditworthiness
-Q51647,,organized effort for the propagation of the Christian faith
-Q2177636,,type of administrative division in Denmark
-Q77115,,"public location where members of a community tend to gather for group activities, social support, public information, and other purposes"
+Q353344,,historical administrative division
+Q20653619,,site occupied by citizens to resist against a construction project
 Q83405,,"facility where goods are industrially made, or processed"
+Q4785006,,community development organisations in Kenya
+Q34627,,"religious building at the center of a local organization where a Jewish (or rarely Samaritan) community gathers for prayer, education, social assistance or ceremonies"
 Q3508373,,consolidated services from several municipalities
+Q4672756,,organization
 Q3269648,,civil society non-profit that operates within a local community
+Q4764972,,rescue organization dedicated to pet adoption
+Q4801240,,visual arts organization jointly owned by its members
 Q3184737,,"group of priests that governs the different activities the cathedrals, called canons"
 Q3577960,,an educational structure similar in focus to a graduate school but restricted to PhD level.
+Q165853,,women's quarters in the traditional house of a Muslim family
 Q79751,,power structure in which power rests with a small number of people
 Q3540209,,concept in sociology which identifies a place which is neither home nor a workplace
-Q2142273,,entity facilitating interactions between two other parties
-Q1346215,,"current political party or coalition of the majority in parliament, that administers the affairs of state"
 Q3349568,,TV channel and radio operator in Benin
-Q2169973,,organization that provides organizations with services
+Q4504013,,
+Q938711,,the collective body of foreign diplomats accredited to a particular country or body
+Q992237,,confraternity or sodality institutions in Venice
+Q2296694,,organized component of a social movement
+Q1032372,,"community-operated physical space where people with common interests, often in computers, technology, science, or art, can socialise, collaborate, or make"
+Q4830453,,"organization undertaking commercial, industrial, or professional activity"
 Q1199840,,type of service company
 Q3509383,,Canadian term for group of television stations not defined as a network
 Q1200676,,workplace for designers and artisans
-Q1328899,,organization that develops standards
 Q3607960,,
 Q1251750,,facility that manufactures alcoholic beverages through distillation
+Q895526,,a designated body with authority
+Q7188,,"system or group of people governing an organized community, often a state"
+Q1328304,,type of organization
+Q2279768,,ancient Japanese governing body
 Q3356081,,
-Q2108946,,organisation
+Q2458164,,"service which collects, screens, processes, and dispenses by prescription human milk donated by nursing mothers not biologically related to the recipient infant;"
+Q4502119,,club or group of artists who share a common ideal
+Q989470,,organized group of video game players
+Q4539,,autonomous association of persons or organizations
+Q1229659,,"building housing goods to be distributed to retailers, wholesalers, or consumers"
+Q996839,,"organization, society, or club of people associated together for various religious or secular aims"
+Q1228967,,group of individuals with similar interest who gather to bring up ideas or solve problems
+Q6498663,,organization with the job to help the public in emergency situations like fire
+Q24764,,administrative division in Philippine provinces
+Q1241025,,"group of researchers often from the same faculty, specialized on the same subject, working together on the issue or topic"
+Q2281788,,"facility and institution that exhibits live aquatic animals and plants in large tanks for the public to view, learn about, and appreciate"
+Q1311569,,railway divisions for administration purposes in Germany and Austria
+Q4651900,,organization providing services to people affected by AIDS and HIV
+Q3487815,,type of corporate entity for licensed professionals
 Q153936,,generally refers to an army or other fighting force that is composed of non-professional fighters
 Q138796,,organized effort to withstand a government or an occupying power
-Q4736565,,organization aligned with the Fair trade movement
-Q4915958,,
-Q4384758,,media content produced by private citizens who are otherwise not professional journalists
-Q4502119,,club or group of artists who share a common ideal
-Q4931514,,
-Q5051107,,"organization that registers domestic, usually purebred, cats"
-Q5165673,,pharmaceutical manufacturing outsourcing organization
-Q2814066,,"a venue, typically a nightclub, bar, or restaurant where people watch or listen to performances, including stand-up comedians, improvisational comedians, impersonators, magicians, ventriloquists and other comedy acts"
-Q4974301,,Dutch collective that allows independent entrepreneurs to provide each other with temporary sick leave
-Q4840249,,service that circulates details of persons that may pose a threat to sex workers
-Q5038204,,network of issuing banks and acquiring banks that process payment cards of a specific brand
-Q2828218,,public or a private legal entity providing Air Navigation Services.
-Q2897382,,
-Q166118,,agency or institution responsible for the preservation and communication of records selected for permanent preservation
-Q4785006,,community development organisations in Kenya
-Q5162950,,"local, community-based natural resource management agency based in Ontario, Canada"
-Q4672756,,organization
-Q4764972,,rescue organization dedicated to pet adoption
-Q4801240,,visual arts organization jointly owned by its members
-Q5163232,,governing body of Jewish congregations of a territory
-Q165853,,women's quarters in the traditional house of a Muslim family
-Q2746884,,specialised internet service provider for research and education communities within a country
-Q4504013,,
-Q5055151,,
-Q2462200,,dynamic set of individuals or institutions defined around a set of resource-sharing rules and conditions
-Q2946037,,
-Q4830453,,"organization undertaking commercial, industrial, or professional activity"
-Q2575910,,term for Japanese clan or family name
-Q5119518,,place where cider is made and its equipment used to crush apples into apple juice for use in making apple cider
-Q1505454,,public-service corporation
-Q163740,,organization operated for a collective benefit
-Q4986492,,organisation whose main aims include the preservation and regeneration of historic buildings
-Q2731185,,organization
-Q1518309,,
-Q4651900,,organization providing services to people affected by AIDS and HIV
-Q2882257,,legally distinct group of Indigenous persons in Canada defined under the Indian Act
-Q1530022,,organization that supports the practice of a religion
-Q2686051,,personal office of a European Commissioner
-Q4763669,,anglo-saxon organization
-Q4738824,,
-Q10983451,,government institution performing financial and/or legal audit
-Q181916,,scientific collection of dried plants
-Q196776,,entity that issues digital certificates
 Q7654539,,group of New Christian churches
-Q11396960,,company or studio that produces media
-Q1729207,,activity carried out by Christians to express or spread their faith
-Q190864,,type of organization
-Q179076,,highly organized trading market
-Q178706,,structure or mechanism of social order and cooperation governing the behaviour of a set of individuals within a given community
-Q195339,,station that is built for the purpose of conducting scientific research
-Q1616178,,relationship of elements to each other when they are unranked or can be ranked in various ways.
-Q11771944,,branch of governmental service or employees of a government agency
-Q1597339,,educational institution or academic community
+Q1514395,,organisation for people with a high IQ score
+Q131186,,ensemble of singers
+Q1550557,,"economic, political and judicial institution during the Middle Age in Europe, governed by a lord owning a land domain that he partly concesses to vassals"
+Q1390062,,space for digital fabrication and use of communal tools
+Q1364298,,dedicated hobby organization that uses flight simulation to model the operations of an airline
+Q1394627,,Sub-ethnical division (social organization) of Chechen and Ingush people
+Q4330364,,organization for sharing services between a variety of clients
 Q7885249,,organization that has not been granted formal corporate status by incorporation
-Q1785733,,organization that seeks to protect the environment
+Q4358176,,"group of people who come together to consult, deliberate, or make decisions"
+Q1377994,,organization type and legal form in the European Union
 Q7865442,,process for investigating troubled areas
+Q3751900,,
 Q1454317,,cross-functional team formed to complete a specific project
-Q13473501,,egalitarian organization with common goal
-Q11812394,,organization that produces theatrical performances
-Q190928,,place where ships are repaired and built
-Q1558054,,place where artists live and interact with each other
-Q210167,,software development organization specializing in the creation of video games (for person use Q58287519)
-Q183288,,national constituent of the worldwide Olympic movement
+Q104157,,administrative division in the Philippines
+Q10341430,,"group of people which operates in the community, in a way that is distinct from both government and business"
+Q112046,,entity which operates infrastructure for bulk transfer of electrical energy on a national or regional level
+Q5055151,,
 Q1808846,,Origin of Wine Designation
-Q197952,,collection of parent and subsidiary corporations that function as a single economic entity through a common source of control
 Q188913,,"artificially established forest, farm or estate, where crops are grown for sale"
 Q11005122,,Type of penal reformatory for juveniles in the 19th century
-Q194166,,"association of two or more individuals, companies, organizations or governments (or any combination of these entities)"
-Q10341430,,"group of people which operates in the community, in a way that is distinct from both government and business"
 Q7975161,,"System of parks in Wisconsin, United States"
 Q11391922,,"university programs which teach policy analysis, policy studies, public policy, political economy, urban planning, public administration, public affairs, and public management"
 Q10656810,,Swedish Christian revival movement
-Q208701,,movement for maintaining or improving the conditions of employment
 Q1788992,,organization that commits crimes
+Q5119518,,place where cider is made and its equipment used to crush apples into apple juice for use in making apple cider
+Q181916,,scientific collection of dried plants
+Q10983451,,government institution performing financial and/or legal audit
 Q1787017,,systematic collection of data about occurrences of cancer in a particular location
 Q7699489,,Social housing-related legal entity
+Q11396960,,company or studio that produces media
+Q1729207,,activity carried out by Christians to express or spread their faith
 Q10686791,,"group of people, usually women, who gather regularly to sew together, often for charity"
 Q10883540,,Organizations that are part of the Chinese Communist Party's United Front
 Q7727036,,kind of organization developed by Kevin Kingsland in 1977
+Q4931514,,
+Q190864,,type of organization
+Q5165673,,pharmaceutical manufacturing outsourcing organization
+Q4986492,,organisation whose main aims include the preservation and regeneration of historic buildings
 Q7864947,,self-organised communal spaces in the UK
+Q178706,,structure or mechanism of social order and cooperation governing the behaviour of a set of individuals within a given community
+Q4840249,,service that circulates details of persons that may pose a threat to sex workers
+Q179076,,highly organized trading market
+Q5038204,,network of issuing banks and acquiring banks that process payment cards of a specific brand
 Q1752346,,organization that uses parliamentary procedure to make decisions
+Q11771944,,branch of governmental service or employees of a government agency
+Q1597339,,educational institution or academic community
+Q190928,,place where ships are repaired and built
+Q1558054,,place where artists live and interact with each other
 Q9078534,,rank organization that recognizes excellence among peers
+Q183288,,national constituent of the worldwide Olympic movement
 Q11288646,,"organizations designed to collect, record and distribute to regular clients information relative to the standing of commercial firms"
-Q353344,,historical administrative division
 Q463080,,regional organization responsible for managing network numbering for its region
+Q196776,,entity that issues digital certificates
+Q13473501,,egalitarian organization with common goal
 Q369729,,organization with a fixed set of rules of intra-organization procedures and structures
 Q16985923,,of the conditions of prisoners in English jails
 Q17092674,,body which oversees electoral redistricting
@@ -191,25 +167,101 @@ Q17103146,,formal or informal group within an organisation seeking to influence 
 Q16949833,,social service organization of the Chabad-Lubavitch movement
 Q16320635,,association of communities in Tyrol for the purpose of comprehensive planning and cooperation
 Q16981758,,"Dutch form of company, association, society or cooperative"
+Q195339,,station that is built for the purpose of conducting scientific research
 Q14946195,,organization created for the practice of magic or to further the knowledge of magic
 Q13757566,,American group of student organizations
 Q336473,,organization with the task to help humans or animals or to protect sensitive cultural goods
+Q485016,,Soviet collective farm
 Q221096,,government service or private business venture which is funded and operated through a partnership of government and one or more private sector companies
 Q324090,,penal work division in the Nazi concentration camps
+Q11812394,,organization that produces theatrical performances
 Q438711,,US regulatory term for a non-exchange trading venue
+Q484652,,organization established by treaty between governments
 Q276548,,club or organization whose activities and inner functioning are concealed from non-members
+Q501519,,facility equipped for coordinating and controlling search and rescue operations
 Q431603,,groups using advocacy in order to influence public opinion and policy
+Q210167,,software development organization specializing in the creation of video games (for person use Q58287519)
 Q327245,,group linked in a common purpose
 Q280783,,gathering of people to discuss important issues
 Q16965797,,national commission of Unesco
+Q197952,,collection of parent and subsidiary corporations that function as a single economic entity through a common source of control
 Q16002704,,a space other than a traditional commercial venue used for the public exhibition of artwork
+Q194166,,"association of two or more individuals, companies, organizations or governments (or any combination of these entities)"
 Q16861792,,Wikimedia committee mainly responsible for implementing binding dispute resolution
 Q450421,,group formed by private citizens to administer law and order where they considered governmental structures to be inadequate
 Q379049,,magazine and website covering the American adult entertainment industry
+Q208701,,movement for maintaining or improving the conditions of employment
 Q16909857,,"Virtual organization temporary or permanent collection of geographically dispersed individuals, groups, organizational units, or entire organizations that depend on electronic linking in order to complete the production process"
-Q15808872,,juridical person and corporation under European Union law
-Q17071851,,group of centers funded by NIOSH
-Q15104323,,"method of agile, decentralized management"
+Q82025391,,Bloody protests against President Alpha Condé
+Q865588,,body of one or more persons that is subordinate to a deliberative assembly
+Q876852,,supervised program for children or teenagers conducted during the summer months
+Q27043907,,venue for learning and practicing yoga
+Q21772656,,fraternity organized as an order
+Q56317876,,Business legal framework in France
+Q64606659,,association working for LGBTQIA+ community and/or individuals
+Q123142650,,fraternal organization
+Q112482884,,group of schools in England and Wales
+Q25184034,,independent organizations celebrating Scottish heritage
+Q876730,,1970–2006
+Q865132,,"organization, fleet and crew of merchant vessels operating under a national flag"
+Q107504067,,British scheme and company
+Q56035565,,community of participants in Wikimedia movement
+Q65083615,,part of the National Health Service in England
+Q48735001,,a social movement for Pashtun human rights
+Q24906286,,religious social organization
+Q22909212,,nonprofit organization
+Q56314241,,Orthodox yeshiva in France
+Q53444003,,UN-designated outstanding geological sites and landscapes
+Q55634774,,organizational paradigm that advocates enabling employee autonomy and adapting it according to the size of an organization
+Q39086937,,association of labour unions
+Q48818079,,
+Q837675,,"sworn body of people convened to render a verdict officially submitted to them by a court, or to set a penalty or judgment"
+Q85790789,,provider of products and services for online courses at educational institutions
+Q97357826,,organization that collects money to pay bail
+Q24190306,,artist-run centre located in Winnipeg
+Q110654863,,
+Q116834119,,legal entity that does not distribute surplus funds to its members and is formed to fulfill specific objectives
 Q783794,,"legal entity representing an association of people, whether natural, legal or a mixture of both, with a specific objective"
 Q694166,,body of servants in service of a dignitary
-Q20653619,,site occupied by citizens to resist against a construction project
+Q673899,,small group of people who meet regularly to discuss work
+Q814610,,organizations which ensure public safety and health by addressing different emergencies
+Q829080,,mission-driven organization seeking to further a particular profession
+Q672070,,place or organisation that undertakes professional-quality photography
+Q543813,,administrative entities established by Nazi Germany during the Second World War
+Q620225,,Catholic missionary jurisdiction of the Catholic Church
+Q686441,,Sunni Islam movement in Indonesia
+Q706486,,several types of cooperative associations or enterprises in pre-Soviet Russia or the Soviet Union
+Q671224,,building or room where computer servers and related equipment are operated
+Q832115,,German works council law
+Q18204722,,computer network organization model
+Q18204617,,organisations set up by Innovate UK
+Q627272,,association of employers for joint advocacy purposes towards trade unions and state
+Q662043,,rural agencies that supplied collective farms with agricultural machinery and people to run it
+Q816676,,
+Q17143723,,lowest canonical subdivision in the Catholic Church; primary constituent unit of a diocese
+Q569500,,"clinic staffed by a group of general practitioners and nurses, providing healthcare services to people in a certain area"
+Q681615,,social organisations of various types
+Q702882,,command office in Nazi Germany
+Q832722,,organizations for Nazi concentration camp survivors
+Q494978,,"geographical region that is designed to export goods and provide employment, in different parts of the world"
+Q18450211,,organization which provides training in diving skills or knowledge
+Q18373809,,"name given to several groups both real and fake, generally affecting superior enlightenment on religious and social matters and marked by hostility towards religion"
+Q20667323,,organisations formed as part of the integration of services provided by Health Boards and Councils in Scotland
+Q20857129,,system of higher education institutions
+Q18207063,,pooling of resources in the context of cryptocurrency mining
+Q833941,,"""Jewish councils"" in Nazi-occupied territories"
+Q7392579,,type of professional organization
+Q51647,,organized effort for the propagation of the Christian faith
+Q7574328,,organization which compiles a list of orators and facilitates speaking events for them
+Q77115,,"public location where members of a community tend to gather for group activities, social support, public information, and other purposes"
+Q115807006,,regional electric energy reliability organization
+Q1785733,,organization that seeks to protect the environment
+Q7315401,,student-run university residence hall organization
+Q7250240,,
+Q7248095,,"network of professional services firms, typically without ownership ties"
+Q7531056,,public health system of Brazil
+Q7649559,,organization aiming to advance sustainability
+Q597897,,student organisation
+Q646293,,social structure that governs how people work together
+Q641347,,"organization that has been allocated a block of IP addresses by a regional Internet registry, and assigns most parts of this block to its own customers"
+Q650241,,institution that provides financial services for its clients or members
