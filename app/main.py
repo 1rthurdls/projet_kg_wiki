@@ -1,19 +1,21 @@
 from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from neo4j.exceptions import Neo4jError
 
+from app.database import Neo4jService
 from app.models.config import settings
 from app.models.schemas import ErrorResponse, HealthResponse
-from app.database import Neo4jService
+from app.routers import advanced_router, graph_router
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(fastapi_app: FastAPI):
     """Manage application lifecycle (startup and shutdown)."""
     neo4j_service = Neo4jService()
-    app.state.neo4j_service = neo4j_service
+    fastapi_app.state.neo4j_service = neo4j_service
     yield
     neo4j_service.close()
 
@@ -37,7 +39,7 @@ app.add_middleware(
 
 # Exception handlers
 @app.exception_handler(Neo4jError)
-async def neo4j_exception_handler(request: Request, exc: Neo4jError):
+async def neo4j_exception_handler(_request: Request, exc: Neo4jError):
     """Handle Neo4j database errors."""
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -50,7 +52,7 @@ async def neo4j_exception_handler(request: Request, exc: Neo4jError):
 
 
 @app.exception_handler(ValueError)
-async def value_error_handler(request: Request, exc: ValueError):
+async def value_error_handler(_request: Request, exc: ValueError):
     """Handle value errors."""
     return JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
@@ -63,7 +65,7 @@ async def value_error_handler(request: Request, exc: ValueError):
 
 
 @app.exception_handler(Exception)
-async def general_exception_handler(request: Request, exc: Exception):
+async def general_exception_handler(_request: Request, exc: Exception):
     """Handle unexpected errors."""
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -89,8 +91,6 @@ async def health_check(request: Request):
 
 
 # Include routers
-from app.routers import advanced_router, graph_router
-
 app.include_router(graph_router.router, prefix="/api/v1", tags=["Graph"])
 app.include_router(advanced_router.router, prefix="/api/v1/advanced", tags=["Advanced"])
 

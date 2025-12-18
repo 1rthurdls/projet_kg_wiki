@@ -1,6 +1,7 @@
 """Tests for Neo4j database service."""
 
 import pytest
+
 from app.database import Neo4jService
 
 

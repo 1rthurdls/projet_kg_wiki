@@ -1,5 +1,6 @@
 from typing import Any
-from neo4j import GraphDatabase, Driver, Session
+
+from neo4j import Driver, GraphDatabase
 from neo4j.exceptions import Neo4jError
 
 from app.models.config import settings
@@ -28,9 +29,7 @@ class Neo4jService:
         except Neo4jError:
             return False
 
-    def execute_query(
-        self, query: str, parameters: dict[str, Any] | None = None
-    ) -> list[dict[str, Any]]:
+    def execute_query(self, query: str, parameters: dict[str, Any] | None = None) -> list[dict[str, Any]]:
         """
         Execute a Cypher query and return results.
 
@@ -48,9 +47,7 @@ class Neo4jService:
             result = session.run(query, parameters or {})
             return [record.data() for record in result]
 
-    def execute_write_query(
-        self, query: str, parameters: dict[str, Any] | None = None
-    ) -> list[dict[str, Any]]:
+    def execute_write_query(self, query: str, parameters: dict[str, Any] | None = None) -> list[dict[str, Any]]:
         """
         Execute a write query within a transaction.
 
@@ -110,9 +107,7 @@ class Neo4jService:
         results = self.execute_query(query, {"entity_id": int(entity_id)})
         return results[0] if results else None
 
-    def get_entity_relationships(
-        self, entity_id: str, direction: str = "both"
-    ) -> list[dict[str, Any]]:
+    def get_entity_relationships(self, entity_id: str, direction: str = "both") -> list[dict[str, Any]]:
         """
         Get relationships for an entity.
 
@@ -151,9 +146,7 @@ class Neo4jService:
         return self.execute_query(query, {"entity_id": int(entity_id)})
 
     # Advanced query methods
-    def find_shortest_path(
-        self, source_id: int, target_id: int, max_depth: int = 5
-    ) -> dict[str, Any]:
+    def find_shortest_path(self, source_id: int, target_id: int, max_depth: int = 5) -> dict[str, Any]:
         """
         Find shortest path between two articles using BFS.
 
@@ -165,7 +158,8 @@ class Neo4jService:
         Returns:
             Path information including nodes and length
         """
-        query = """
+        query = (
+            """
         MATCH (source:Article {id: $source_id})
         MATCH (target:Article {id: $target_id})
         MATCH path = shortestPath((source)-[:REFERS_TO*..%d]-(target))
@@ -175,15 +169,14 @@ class Neo4jService:
             community_id: node.community_id
         }] as path,
         length(path) as length
-        """ % max_depth
-
-        results = self.execute_query(
-            query, {"source_id": source_id, "target_id": target_id}
+        """
+            % max_depth
         )
+
+        results = self.execute_query(query, {"source_id": source_id, "target_id": target_id})
         if results:
             return {"path": results[0]["path"], "length": results[0]["length"], "exists": True}
-        else:
-            return {"path": [], "length": 0, "exists": False}
+        return {"path": [], "length": 0, "exists": False}
 
     def get_recommendations(
         self, article_id: int, limit: int = 10, strategy: str = "community"
@@ -324,9 +317,7 @@ class Neo4jService:
             "top_articles": top_articles,
         }
 
-    def export_subgraph(
-        self, community_id: int, include_cross_edges: bool = False
-    ) -> dict[str, Any]:
+    def export_subgraph(self, community_id: int, include_cross_edges: bool = False) -> dict[str, Any]:
         """
         Export a subgraph for a specific community.
 
