@@ -8,4 +8,5 @@ services:
       - NEO4J_AUTH=neo4j/password
       - NEO4J_dbms_security_allow__csv__import__from__file__urls=true
     volumes:
-      - ./data/import:/var/lib/neo4j/import
+      - ./data/query_wikiperdia/import:/var/lib/neo4j/import
+
