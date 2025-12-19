@@ -5,5 +5,3 @@ To run the extraction of the data on a basis of a query you need to run
 ```bash
 python retrieve.py
 ```
-This code retrieves 5K examples of articles authors 
-
