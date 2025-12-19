@@ -362,37 +362,6 @@ For detailed architecture information, see [ARCHITECTURE.md](./ARCHITECTURE.md).
 
 ---
 
-## 👥 Team Contributions
-
-### Commit Statistics
-
-| Member    | Commits | Percentage | Pull Requests |
-|-----------|---------|------------|---------------|
-| Philippe  | TBD     | TBD%       | TBD merged    |
-| Member 2  | TBD     | TBD%       | TBD merged    |
-| Member 3  | TBD     | TBD%       | TBD merged    |
-| Member 4  | TBD     | TBD%       | TBD merged    |
-| Member 5  | TBD     | TBD%       | TBD merged    |
-
-**Total**: TBD commits
-
-### Role Distribution
-
-- **Philippe**: Project architecture, API design, documentation
-- **Member 2**: TBD
-- **Member 3**: TBD
-- **Member 4**: TBD
-- **Member 5**: TBD
-
-### Major Pull Requests
-
-1. [#TBD - Initial project setup](link)
-2. [#TBD - Add Docker configuration](link)
-3. [#TBD - Implement advanced endpoints](link)
-4. [#TBD - Add comprehensive tests](link)
-
----
-
 ## 📁 Project Structure
 
 ```
