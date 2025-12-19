@@ -16,8 +16,9 @@ A comprehensive knowledge graph system built with Neo4j and FastAPI that enables
 - 📊 **Related Articles**: Intelligent recommendations based on graph relationships
 - 🗺️ **Topic Exploration**: Navigate hierarchical topic structures with customizable depth
 - ✍️ **Author Tracking**: Monitor contributions and authorship patterns
-- 🎯 **Community Detection**: Identify article clusters using advanced graph algorithms
+- 🎯 **Community Detection**: Identify article clusters using Louvain algorithm
 - 📈 **Advanced Analytics**: Comprehensive graph statistics and network metrics
+- 🧠 **Graph Data Science**: PageRank, Louvain, and Node Similarity algorithms powered by Neo4j GDS
 
 **Difficulty Level**: 1 (Introductory) - Extended with advanced features
 
@@ -263,6 +264,48 @@ curl -X POST http://localhost:80/api/v1/advanced/subgraph/export \
     "include_cross_edges": false
   }'
 ```
+
+### Graph Data Science (GDS) Endpoints
+
+#### 8. PageRank - Article Importance Ranking
+```bash
+curl -X POST http://localhost:80/api/v1/advanced/gds/pagerank \
+  -H "Content-Type: application/json" \
+  -d '{
+    "max_iterations": 20,
+    "damping_factor": 0.85,
+    "limit": 10
+  }'
+```
+
+Returns the top 10 most important articles based on citation network structure.
+
+#### 9. Louvain - Community Detection
+```bash
+curl -X POST http://localhost:80/api/v1/advanced/gds/louvain \
+  -H "Content-Type: application/json" \
+  -d '{
+    "max_levels": 10,
+    "include_intermediate_communities": false
+  }'
+```
+
+Detects topical communities using modularity optimization.
+
+#### 10. Node Similarity - Find Similar Articles
+```bash
+curl -X POST http://localhost:80/api/v1/advanced/gds/similarity \
+  -H "Content-Type: application/json" \
+  -d '{
+    "article_id": "A000000",
+    "limit": 10,
+    "similarity_cutoff": 0.1
+  }'
+```
+
+Finds articles similar to a given article based on shared references (Jaccard similarity).
+
+**See [GDS_FEATURES.md](./GDS_FEATURES.md) for detailed documentation of all Graph Data Science algorithms.**
 
 ### Example Responses
 

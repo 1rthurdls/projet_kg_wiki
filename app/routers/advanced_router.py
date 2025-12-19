@@ -5,12 +5,21 @@ from app.models.schemas import (
     AnalyticsResponse,
     ArticleStats,
     CommunityStats,
+    LouvainCommunity,
+    LouvainRequest,
+    LouvainResponse,
+    NodeSimilarityRequest,
+    NodeSimilarityResponse,
+    PageRankRequest,
+    PageRankResponse,
+    PageRankResult,
     PathNode,
     PathRequest,
     PathResponse,
     RecommendationRequest,
     RecommendationResponse,
     RecommendedArticle,
+    SimilarArticle,
     SubgraphRequest,
     SubgraphResponse,
 )
@@ -234,4 +243,206 @@ async def get_community_stats(request: Request, community_id: int):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to retrieve community stats: {str(e)}",
+        ) from e
+
+
+# Graph Data Science (GDS) Endpoints
+
+
+@router.post("/gds/pagerank", response_model=PageRankResponse, tags=["Graph Data Science"])
+async def calculate_pagerank(request: Request, pagerank_request: PageRankRequest):
+    """
+    Calculate PageRank scores for articles in the knowledge graph.
+
+    **PageRank** is a link analysis algorithm that measures the importance of nodes
+    based on the structure of incoming links. Articles cited by many other important
+    articles will have higher PageRank scores.
+
+    **Use Cases**:
+    - Identify most influential/authoritative articles
+    - Rank search results by importance
+    - Discover central articles in the knowledge graph
+
+    **Parameters**:
+    - `max_iterations`: Maximum iterations for convergence (default: 20)
+    - `damping_factor`: Probability of following a link vs. random jump (default: 0.85)
+    - `limit`: Number of top results to return (default: 10)
+
+    **Returns**:
+    - Top-ranked articles with PageRank scores
+    - Total nodes analyzed
+    - Execution time in milliseconds
+
+    **Example Request**:
+    ```json
+    {
+        "max_iterations": 20,
+        "damping_factor": 0.85,
+        "limit": 10
+    }
+    ```
+
+    **Note**: Requires Neo4j GDS plugin. Falls back to degree centrality if GDS unavailable.
+    """
+    neo4j_service: Neo4jService = request.app.state.neo4j_service
+
+    try:
+        result = neo4j_service.run_pagerank(
+            max_iterations=pagerank_request.max_iterations,
+            damping_factor=pagerank_request.damping_factor,
+            limit=pagerank_request.limit,
+        )
+
+        # Convert results to Pydantic models
+        pagerank_results = [PageRankResult(**res) for res in result["results"]]
+
+        return PageRankResponse(
+            algorithm="PageRank",
+            total_nodes=result["total_nodes"],
+            results=pagerank_results,
+            execution_time_ms=result["execution_time_ms"],
+        )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"PageRank calculation failed: {str(e)}",
+        ) from e
+
+
+@router.post("/gds/louvain", response_model=LouvainResponse, tags=["Graph Data Science"])
+async def detect_communities_louvain(request: Request, louvain_request: LouvainRequest):
+    """
+    Detect communities in the article network using the Louvain algorithm.
+
+    **Louvain** is a modularity-based community detection algorithm that identifies
+    densely connected groups of articles. It works by optimizing modularity scores
+    through hierarchical agglomeration.
+
+    **Use Cases**:
+    - Discover topical clusters in the knowledge graph
+    - Identify research areas or subject domains
+    - Group related articles for recommendation systems
+    - Analyze knowledge graph structure
+
+    **Parameters**:
+    - `max_levels`: Maximum hierarchy levels to explore (default: 10)
+    - `include_intermediate_communities`: Return intermediate levels (default: false)
+
+    **Returns**:
+    - List of detected communities with sizes
+    - Overall modularity score (higher = better community structure)
+    - Total number of communities detected
+    - Execution time in milliseconds
+
+    **Modularity Score**:
+    - Range: -0.5 to 1.0
+    - > 0.3: Strong community structure
+    - 0.1 - 0.3: Moderate community structure
+    - < 0.1: Weak community structure
+
+    **Example Request**:
+    ```json
+    {
+        "max_levels": 10,
+        "include_intermediate_communities": false
+    }
+    ```
+
+    **Note**: Requires Neo4j GDS plugin. Falls back to existing Community nodes if unavailable.
+    """
+    neo4j_service: Neo4jService = request.app.state.neo4j_service
+
+    try:
+        result = neo4j_service.run_louvain(
+            max_levels=louvain_request.max_levels,
+            include_intermediate=louvain_request.include_intermediate_communities,
+        )
+
+        # Convert results to Pydantic models
+        communities = [LouvainCommunity(**comm) for comm in result["communities"]]
+
+        return LouvainResponse(
+            algorithm="Louvain",
+            total_communities=result["total_communities"],
+            modularity=result["modularity"],
+            communities=communities,
+            execution_time_ms=result["execution_time_ms"],
+        )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Louvain community detection failed: {str(e)}",
+        ) from e
+
+
+@router.post("/gds/similarity", response_model=NodeSimilarityResponse, tags=["Graph Data Science"])
+async def find_similar_articles(request: Request, similarity_request: NodeSimilarityRequest):
+    """
+    Find similar articles using the Node Similarity algorithm.
+
+    **Node Similarity** computes pairwise similarity scores between articles based on
+    their neighborhood overlap. Articles that cite similar references are considered similar.
+
+    **Algorithm**: Uses Jaccard similarity on node neighborhoods:
+    - Jaccard(A, B) = |neighbors(A) ∩ neighbors(B)| / |neighbors(A) ∪ neighbors(B)|
+
+    **Use Cases**:
+    - Content-based article recommendations
+    - Finding related research papers
+    - Duplicate detection
+    - Link prediction
+
+    **Parameters**:
+    - `article_id`: Source article ID to find similar articles for
+    - `limit`: Number of similar articles to return (default: 10)
+    - `similarity_cutoff`: Minimum similarity threshold 0-1 (default: 0.1)
+
+    **Returns**:
+    - List of similar articles with similarity scores
+    - Common neighbor counts
+    - Execution time in milliseconds
+
+    **Similarity Score Interpretation**:
+    - 1.0: Identical neighborhood (same references)
+    - 0.7-1.0: Very similar articles
+    - 0.3-0.7: Moderately similar
+    - < 0.3: Weakly similar
+
+    **Example Request**:
+    ```json
+    {
+        "article_id": "A000000",
+        "limit": 10,
+        "similarity_cutoff": 0.1
+    }
+    ```
+
+    **Note**: Requires Neo4j GDS plugin. Falls back to Cypher-based Jaccard similarity if unavailable.
+    """
+    neo4j_service: Neo4jService = request.app.state.neo4j_service
+
+    try:
+        result = neo4j_service.run_node_similarity(
+            article_id=similarity_request.article_id,
+            limit=similarity_request.limit,
+            similarity_cutoff=similarity_request.similarity_cutoff,
+        )
+
+        # Convert results to Pydantic models
+        similar_articles = [SimilarArticle(**article) for article in result["similar_articles"]]
+
+        return NodeSimilarityResponse(
+            algorithm="Node Similarity",
+            source_article_id=result["source_article_id"],
+            source_article_title=result["source_article_title"],
+            similar_articles=similar_articles,
+            execution_time_ms=result["execution_time_ms"],
+        )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Node similarity calculation failed: {str(e)}",
         ) from e

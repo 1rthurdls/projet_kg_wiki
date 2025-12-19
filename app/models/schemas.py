@@ -160,3 +160,84 @@ class SubgraphResponse(BaseModel):
     edges: list[dict[str, Any]] = Field(..., description="Edges between articles")
     node_count: int = Field(..., description="Number of nodes")
     edge_count: int = Field(..., description="Number of edges")
+
+
+# Graph Data Science (GDS) models
+class PageRankRequest(BaseModel):
+    """Request model for PageRank algorithm."""
+
+    max_iterations: int = Field(default=20, ge=1, le=100, description="Maximum iterations")
+    damping_factor: float = Field(default=0.85, ge=0.0, le=1.0, description="Damping factor")
+    limit: int = Field(default=10, ge=1, le=100, description="Number of top results")
+
+
+class PageRankResult(BaseModel):
+    """PageRank result for a single article."""
+
+    article_id: str = Field(..., description="Article ID")
+    article_title: str = Field(..., description="Article title")
+    score: float = Field(..., description="PageRank score")
+    rank: int = Field(..., description="Rank position")
+
+
+class PageRankResponse(BaseModel):
+    """Response model for PageRank algorithm."""
+
+    algorithm: str = Field(default="PageRank", description="Algorithm name")
+    total_nodes: int = Field(..., description="Total nodes analyzed")
+    results: list[PageRankResult] = Field(..., description="Top ranked articles")
+    execution_time_ms: float = Field(..., description="Execution time in milliseconds")
+
+
+class LouvainRequest(BaseModel):
+    """Request model for Louvain community detection."""
+
+    max_levels: int = Field(default=10, ge=1, le=50, description="Maximum hierarchy levels")
+    include_intermediate_communities: bool = Field(
+        default=False, description="Include intermediate community levels"
+    )
+
+
+class LouvainCommunity(BaseModel):
+    """Community detected by Louvain algorithm."""
+
+    community_id: int = Field(..., description="Community ID")
+    size: int = Field(..., description="Number of articles")
+    modularity: float = Field(..., description="Modularity score")
+
+
+class LouvainResponse(BaseModel):
+    """Response model for Louvain community detection."""
+
+    algorithm: str = Field(default="Louvain", description="Algorithm name")
+    total_communities: int = Field(..., description="Total communities detected")
+    modularity: float = Field(..., description="Overall modularity score")
+    communities: list[LouvainCommunity] = Field(..., description="Detected communities")
+    execution_time_ms: float = Field(..., description="Execution time in milliseconds")
+
+
+class NodeSimilarityRequest(BaseModel):
+    """Request model for Node Similarity algorithm."""
+
+    article_id: str = Field(..., description="Source article ID")
+    limit: int = Field(default=10, ge=1, le=50, description="Number of similar articles")
+    similarity_cutoff: float = Field(default=0.1, ge=0.0, le=1.0, description="Minimum similarity score")
+
+
+class SimilarArticle(BaseModel):
+    """Similar article result."""
+
+    article_id: str = Field(..., description="Article ID")
+    article_title: str = Field(..., description="Article title")
+    similarity_score: float = Field(..., description="Similarity score (0-1)")
+    common_neighbors: int = Field(..., description="Number of common neighbors")
+
+
+class NodeSimilarityResponse(BaseModel):
+    """Response model for Node Similarity algorithm."""
+
+    algorithm: str = Field(default="Node Similarity", description="Algorithm name")
+    source_article_id: str = Field(..., description="Source article ID")
+    source_article_title: str = Field(..., description="Source article title")
+    similar_articles: list[SimilarArticle] = Field(..., description="Similar articles")
+    execution_time_ms: float = Field(..., description="Execution time in milliseconds")
