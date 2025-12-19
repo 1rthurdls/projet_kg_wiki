@@ -78,9 +78,13 @@ test:
 
 lint:
 	@echo "Running pylint..."
-	@if command -v pylint >/dev/null 2>&1; then \
-		pylint app || true; \
-	else echo "pylint not installed (add to requirements.txt)"; fi
+	@if [ -d ".venv" ]; then \
+		. .venv/bin/activate && pylint app || true; \
+	else \
+		if command -v pylint >/dev/null 2>&1; then \
+			pylint app || true; \
+		else echo "pylint not installed (add to requirements.txt)"; fi; \
+	fi
 
 format:
 	@echo "Formatting code with black..."
