@@ -5,3 +5,4 @@ To run the extraction of the data on a basis of a query you need to run
 ```bash
 python retrieve.py
 ```
+The code retrieves 250 articles
