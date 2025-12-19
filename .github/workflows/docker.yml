@@ -29,7 +29,8 @@ jobs:
       id: meta
       uses: docker/metadata-action@v4
       with:
-        images: ${{ secrets.DOCKER_USERNAME }}/kg-wiki-api
+        images: |
+          ${{ github.event_name == 'pull_request' && 'kg-wiki-api' || format('{0}/kg-wiki-api', secrets.DOCKER_USERNAME) }}
         tags: |
           type=ref,event=branch
           type=ref,event=pr
